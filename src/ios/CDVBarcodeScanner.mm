@@ -173,7 +173,7 @@
     
     
     
-
+    
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
@@ -203,7 +203,7 @@
     
     NSDictionary *mainDictionary = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Info" ofType:@"plist"]];
     NSArray *orientations = [mainDictionary objectForKey:@"UISupportedInterfaceOrientations"];
-
+    
     processor.isPortraitOrientationEnabled = false;
     processor.isLandscapeOrientationEnabled = false;
     processor.isUpsideDownOrientationEnabled = false;
@@ -1021,11 +1021,13 @@ parentViewController:(UIViewController*)parentViewController
     UIImage * cancelImageStateNormal = [[SVGKImage imageNamed: @"www/assets/images/close"] UIImage];
     
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
-    [innerCancelButton setBackgroundImage: cancelImageStateNormal forState: UIControlStateNormal];
+    [innerCancelButton setFrame: CGRectMake(0, 0, 40, 40)];
+    [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
+    innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
     [innerCancelButton addTarget: (id)self action: @selector(cancelButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
-    
     id cancelButton = [[UIBarButtonItem alloc] initWithCustomView: innerCancelButton];
-    [innerCancelButton sizeToFit];
+    
     
     
     id flexSpace = [[[UIBarButtonItem alloc]
@@ -1075,12 +1077,15 @@ parentViewController:(UIViewController*)parentViewController
             UIImage * flashlightImageStateSelected = [[SVGKImage imageNamed: @"www/assets/images/flashlight-active"] UIImage];
             
             UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
-            [flashlightButton setBackgroundImage: flashlightImageStateNormal forState:UIControlStateNormal];
-            [flashlightButton setBackgroundImage: flashlightImageStateSelected forState:UIControlStateSelected];
+            [flashlightButton setFrame: CGRectMake(0, 0, 40, 40)];
+            [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
+            [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
+            
+            flashlightButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+            flashlightButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
             [flashlightButton addTarget: (id)self action: @selector(torchButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
             
             id torchButton = [[UIBarButtonItem alloc] initWithCustomView: flashlightButton];
-            [flashlightButton sizeToFit];
             [items insertObject:torchButton atIndex:0];
         }
     }
