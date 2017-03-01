@@ -5,11 +5,13 @@ repositories{
     flatDir{
         dirs 'libs'
     }
+    maven { url "https://jitpack.io" }
+
 }
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile(name:'barcodescanner', ext:'aar')
+    compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:master'
 }
 
 android {
