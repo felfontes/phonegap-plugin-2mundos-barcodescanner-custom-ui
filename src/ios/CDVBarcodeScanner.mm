@@ -73,6 +73,12 @@
 @property (nonatomic)         BOOL                        isTransitionAnimated;
 @property (nonatomic)         BOOL                        isSuccessBeepEnabled;
 @property (nonatomic, retain) NSString*                   prompt;
+@property (nonatomic)         BOOL                        isLandscapeOrientationEnabled;
+@property (nonatomic)         BOOL                        isPortraitOrientationEnabled;
+@property (nonatomic)         BOOL                        isUpsideDownOrientationEnabled;
+
+
+
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -165,6 +171,9 @@
         options = command.arguments[0];
     }
     
+    
+    
+
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
@@ -191,6 +200,29 @@
                   alterateOverlayXib:overlayXib
                   ] autorelease];
     // queue [processor scanBarcode] to run on the event loop
+    
+    NSDictionary *mainDictionary = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Info" ofType:@"plist"]];
+    NSArray *orientations = [mainDictionary objectForKey:@"UISupportedInterfaceOrientations"];
+
+    processor.isPortraitOrientationEnabled = false;
+    processor.isLandscapeOrientationEnabled = false;
+    processor.isUpsideDownOrientationEnabled = false;
+    
+    
+    for (NSString *orientation in orientations) {
+        if([orientation isEqualToString: @"UIInterfaceOrientationPortrait"]) {
+            processor.isPortraitOrientationEnabled = true;
+        }
+        if([orientation isEqualToString: @"UIInterfaceOrientationLandscapeLeft"]) {
+            processor.isLandscapeOrientationEnabled = true;
+        }
+        if([orientation isEqualToString: @"UIInterfaceOrientationLandscapeRight"]) {
+            processor.isLandscapeOrientationEnabled = true;
+        }
+        if([orientation isEqualToString: @"UIInterfaceOrientationPortraitUpsideDown"]) {
+            processor.isUpsideDownOrientationEnabled = true;
+        }
+    }
     
     if (preferFrontCamera) {
         processor.isFrontCamera = true;
@@ -1182,7 +1214,23 @@ parentViewController:(UIViewController*)parentViewController
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    return UIInterfaceOrientationMaskAll;
+    if(_processor.isPortraitOrientationEnabled && _processor.isLandscapeOrientationEnabled && _processor.isUpsideDownOrientationEnabled) {
+        return UIInterfaceOrientationMaskAll;
+    } else if(_processor.isPortraitOrientationEnabled && _processor.isLandscapeOrientationEnabled) {
+        return UIInterfaceOrientationMaskAllButUpsideDown;
+    } else if(_processor.isPortraitOrientationEnabled && _processor.isUpsideDownOrientationEnabled) {
+        return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+    } else if(_processor.isLandscapeOrientationEnabled && _processor.isUpsideDownOrientationEnabled) {
+        return UIInterfaceOrientationMaskAll;
+    } else if(_processor.isPortraitOrientationEnabled) {
+        return UIInterfaceOrientationMaskPortrait;
+    } else if(_processor.isLandscapeOrientationEnabled) {
+        return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscape;
+    } else if(_processor.isUpsideDownOrientationEnabled) {
+        return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+    } else {
+        return UIInterfaceOrientationMaskAll;
+    }
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
