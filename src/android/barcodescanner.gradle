@@ -1,9 +1,7 @@
 cdvMinSdkVersion = Math.max(15, cdvHelpers.getConfigPreference('android-minSdkVersion', 0) as Integer)
 
 repositories{
-    mavenCentral()
     jcenter()
-    maven { url 'https://jitpack.io' }
     flatDir{
         dirs 'libs'
     }
@@ -15,11 +13,6 @@ dependencies {
 }
 
 android {
-    repositories {
-        jcenter()
-        maven { url "https://jitpack.io" }
-    }
-
     packagingOptions {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
@@ -28,7 +21,6 @@ android {
 
 allprojects {
     repositories {
-        jcenter()
         maven { url 'https://jitpack.io' }
     }
 }
