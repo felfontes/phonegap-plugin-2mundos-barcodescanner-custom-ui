@@ -9,12 +9,18 @@ repositories{
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile(name:'barcodescanner', ext:'aar')
+    compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:2.1.8-sov'
 }
 
 android {
     packagingOptions {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
     }
 }
