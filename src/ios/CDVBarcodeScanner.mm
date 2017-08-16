@@ -8,7 +8,6 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "SVGKImage.h"
 
 //------------------------------------------------------------------------------
 // use the all-in-one version of zxing that we built
@@ -127,6 +126,8 @@
 - (UIImage*)buildReticleImage;
 - (void)shutterButtonPressed;
 - (IBAction)cancelButtonPressed:(id)sender;
+- (IBAction)flipCameraButtonPressed:(id)sender;
+- (IBAction)torchButtonPressed:(id)sender;
 
 @end
 
@@ -975,7 +976,7 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 //--------------------------------------------------------------------------
-- (void)shutterButtonPressed {
+- (IBAction)shutterButtonPressed {
     self.shutterPressed = YES;
 }
 
@@ -984,12 +985,12 @@ parentViewController:(UIViewController*)parentViewController
     [self.processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
 }
 
-- (void)flipCameraButtonPressed:(id)sender
+- (IBAction)flipCameraButtonPressed:(id)sender
 {
     [self.processor performSelector:@selector(flipCamera) withObject:nil afterDelay:0];
 }
 
-- (void)torchButtonPressed:(id)sender
+- (IBAction)torchButtonPressed:(id)sender
 {
     UIButton *button = sender;
     if(button.selected) {
@@ -1010,12 +1011,20 @@ parentViewController:(UIViewController*)parentViewController
         NSLog(@"%@", @"An error occurred loading the overlay xib.  It appears that the overlayView outlet is not set.");
         return nil;
     }
+	
+	self.overlayView.autoresizesSubviews = YES;
+    self.overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.overlayView.opaque              = NO;
+	
+	CGRect bounds = self.view.bounds;
+    bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
+	
+	[self.overlayView setFrame:bounds];
     
     return self.overlayView;
 }
 
-#define RETICLE_OFFSET   50.0f
-//NSString *text = @"Leiten Sie den Ladevorgang ein indem Sie den QR-Code scannen";
+#define RETICLE_OFFSET   15.0f
 
 //--------------------------------------------------------------------------
 - (UIView*)buildOverlayView {
@@ -1032,14 +1041,17 @@ parentViewController:(UIViewController*)parentViewController
     overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     overlayView.opaque              = NO;
     
+    NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
+    NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     
-    UIImage * cancelImageStateNormal = [[SVGKImage imageNamed: @"www/assets/images/close"] UIImage];
+    NSString *imagePathClose = [bundle pathForResource:@"close" ofType:@"png"];
+    UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
     
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
-    [innerCancelButton setFrame: CGRectMake(0, 0, 40, 40)];
+    [innerCancelButton setFrame: CGRectMake(0, 0, 20, 20)];
     [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
     innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
     innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
@@ -1091,11 +1103,14 @@ parentViewController:(UIViewController*)parentViewController
         AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
         if ([device hasTorch] && [device hasFlash]) {
             
-            UIImage * flashlightImageStateNormal = [[SVGKImage imageNamed: @"www/assets/images/flashlight-inactive"] UIImage];
-            UIImage * flashlightImageStateSelected = [[SVGKImage imageNamed: @"www/assets/images/flashlight-active"] UIImage];
+            NSString *imagePathFlashlightActive = [bundle pathForResource:@"flashlight_active" ofType:@"png"];
+            NSString *imagePathFlashlightInactive = [bundle pathForResource:@"flashlight_inactive" ofType:@"png"];
+            
+            UIImage * flashlightImageStateNormal = [UIImage imageWithContentsOfFile:imagePathFlashlightInactive];
+            UIImage * flashlightImageStateSelected = [UIImage imageWithContentsOfFile:imagePathFlashlightActive];
             
             UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
-            [flashlightButton setFrame: CGRectMake(0, 0, 40, 40)];
+            [flashlightButton setFrame: CGRectMake(0, 0, 35, 40)];
             [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
             [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
             
