@@ -67,84 +67,25 @@ If you're using [PhoneGap Build](https://build.phonegap.com/) please make sure y
 The plugin creates the object `cordova.plugins.barcodeScanner` with the method `scan(success, fail)`.
 
 The following barcode types are currently supported:
-### Android
 
-* QR_CODE
-* DATA_MATRIX
-* UPC_E
-* UPC_A
-* EAN_8
-* EAN_13
-* CODE_128
-* CODE_39
-* CODE_93
-* CODABAR
-* ITF
-* RSS14
-* RSS_EXPANDED
-
-Not by default, but supported if you pass in the "formats" option:
-* PDF_417
-* AZTEC
-
-### iOS
-
-* QR_CODE
-* DATA_MATRIX
-* UPC_E
-* UPC_A
-* EAN_8
-* EAN_13
-* CODE_128
-* CODE_39
-* ITF
-
-### Windows
-
-* UPC_A
-* UPC_E
-* EAN_8
-* EAN_13
-* CODE_39
-* CODE_93
-* CODE_128
-* ITF
-* CODABAR
-* MSI
-* RSS14
-* QR_CODE
-* DATA_MATRIX
-* AZTEC
-* PDF_417
-
-### Windows Phone 8
-
-* UPC_A
-* UPC_E
-* EAN_8
-* EAN_13
-* CODE_39
-* CODE_93
-* CODE_128
-* ITF
-* CODABAR
-* MSI
-* RSS14
-* QR_CODE
-* DATA_MATRIX
-* AZTEC
-* PDF_417
-
-### BlackBerry 10
-* UPC_A
-* UPC_E
-* EAN_8
-* EAN_13
-* CODE_39
-* CODE_128
-* ITF
-* DATA_MATRIX
-* AZTEC
+|  Barcode Type | Android | iOS | Windows8 | Windows Phone 8 | BlackBerry 10 |
+|---------------|:-------:|:---:|:--------:|:---------------:|:-------------:|
+| QR_CODE       |    ✔    |  ✔  |     ✔    |        ✔        |       ✖       |
+| DATA_MATRIX   |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| UPC_A         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| UPC_E         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| EAN_8         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| EAN_13        |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| CODE_39       |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| CODE_93       |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
+| CODE_128      |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| CODABAR       |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
+| ITF           |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
+| RSS14         |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
+| PDF417        |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
+| RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |        ✖        |       ✖       |
+| MSI           |    ✖    |  ✖  |     ✔    |        ✔        |       ✖       |
+| AZTEC         |    ✖    |  ✖  |     ✔    |        ✔        |       ✔       |
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
@@ -165,13 +106,13 @@ A full example could be:
           showFlipCameraButton : true, // iOS and Android
           showTorchButton : true, // iOS and Android
           torchOn: true, // Android, launch with the torch switched on (if available)
-          saveHistory: true // Android, save scan history (default false)
+          saveHistory: true, // Android, save scan history (default false)
           prompt : "Place a barcode inside the scan area", // Android
           resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
           formats : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
           orientation : "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
           disableAnimations : true, // iOS
-          disableSuccessBeep: false // iOS
+          disableSuccessBeep: false // iOS and Android
       }
    );
 ```
