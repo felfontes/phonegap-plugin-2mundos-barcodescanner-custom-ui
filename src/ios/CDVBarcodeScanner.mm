@@ -8,7 +8,6 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "SVGKImage.h"
 
 //------------------------------------------------------------------------------
 // use the all-in-one version of zxing that we built
@@ -1031,14 +1030,17 @@ parentViewController:(UIViewController*)parentViewController
     overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     overlayView.opaque              = NO;
     
+    NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
+    NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     
-    UIImage * cancelImageStateNormal = [[SVGKImage imageNamed: @"www/assets/images/close"] UIImage];
+    NSString *imagePathClose = [bundle pathForResource:@"close" ofType:@"png"];
+    UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
     
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
-    [innerCancelButton setFrame: CGRectMake(0, 0, 40, 40)];
+    [innerCancelButton setFrame: CGRectMake(0, 0, 20, 20)];
     [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
     innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
     innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
@@ -1090,11 +1092,14 @@ parentViewController:(UIViewController*)parentViewController
         AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
         if ([device hasTorch] && [device hasFlash]) {
             
-            UIImage * flashlightImageStateNormal = [[SVGKImage imageNamed: @"www/assets/images/flashlight-inactive"] UIImage];
-            UIImage * flashlightImageStateSelected = [[SVGKImage imageNamed: @"www/assets/images/flashlight-active"] UIImage];
+            NSString *imagePathFlashlightActive = [bundle pathForResource:@"flashlight_active" ofType:@"png"];
+            NSString *imagePathFlashlightInactive = [bundle pathForResource:@"flashlight_inactive" ofType:@"png"];
+            
+            UIImage * flashlightImageStateNormal = [UIImage imageWithContentsOfFile:imagePathFlashlightInactive];
+            UIImage * flashlightImageStateSelected = [UIImage imageWithContentsOfFile:imagePathFlashlightActive];
             
             UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
-            [flashlightButton setFrame: CGRectMake(0, 0, 40, 40)];
+            [flashlightButton setFrame: CGRectMake(0, 0, 35, 40)];
             [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
             [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
             
