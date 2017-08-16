@@ -1014,8 +1014,7 @@ parentViewController:(UIViewController*)parentViewController
     return self.overlayView;
 }
 
-#define RETICLE_OFFSET   50.0f
-//NSString *text = @"Leiten Sie den Ladevorgang ein indem Sie den QR-Code scannen";
+#define RETICLE_OFFSET   15.0f
 
 //--------------------------------------------------------------------------
 - (UIView*)buildOverlayView {
