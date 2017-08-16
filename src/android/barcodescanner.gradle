@@ -13,7 +13,7 @@ repositories{
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:develop'
+    compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:162d7a1b4153a4eabd781a199cd372270540bf74'
 }
 
 android {
