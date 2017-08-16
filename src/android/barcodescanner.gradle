@@ -1,3 +1,6 @@
+include ':Dependency'
+project(':Dependency').projectDir = new File(settingsDir, '../BarcodescannerLibAarCustomUI')
+
 def DEFAULT_MIN_SDK_VERSION = 15
 def minSdk = Math.max(DEFAULT_MIN_SDK_VERSION, cdvHelpers.getConfigPreference('android-minSdkVersion',0) as Integer);
 if (cdvMinSdkVersion == null || Integer.parseInt('' + cdvMinSdkVersion) < minSdk ) {
@@ -13,7 +16,8 @@ repositories{
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:b5e9d758dace4a96f6566164c57bd7cdc5a32f72'
+    compile project(':Dependency')
+    // compile 'com.github.sovanta:barcodescanner-lib-aar-custom-ui:b5e9d758dace4a96f6566164c57bd7cdc5a32f72'
 }
 
 android {
