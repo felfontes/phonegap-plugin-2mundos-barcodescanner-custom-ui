@@ -1052,6 +1052,8 @@ parentViewController:(UIViewController*)parentViewController
     
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
     [innerCancelButton setFrame: CGRectMake(0, 0, 20, 20)];
+    [innerCancelButton.widthAnchor constraintEqualToConstant: 20.0].active = YES;
+    [innerCancelButton.heightAnchor constraintEqualToConstant: 20.0].active = YES;
     [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
     innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
     innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
@@ -1111,6 +1113,8 @@ parentViewController:(UIViewController*)parentViewController
             
             UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
             [flashlightButton setFrame: CGRectMake(0, 0, 35, 40)];
+            [flashlightButton.widthAnchor constraintEqualToConstant: 35.0].active = YES;
+            [flashlightButton.heightAnchor constraintEqualToConstant: 40.0].active = YES;
             [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
             [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
             
