@@ -1044,6 +1044,8 @@ parentViewController:(UIViewController*)parentViewController
     NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
     NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     
+    UIColor *headerFooterBackgroundColor = [UIColor colorWithRed:244 green:250 blue:252 alpha: 1.0];
+    
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     
@@ -1178,7 +1180,7 @@ parentViewController:(UIViewController*)parentViewController
     [overlayView.layer addSublayer: fillLayer];
     
     UIView * headerView = [[UIView alloc] initWithFrame: CGRectZero];
-    headerView.backgroundColor = [UIColor colorWithRed:244 green:250 blue:252 alpha: 1.0];
+    headerView.backgroundColor = headerFooterBackgroundColor;
     UITextView* textView = [self buildTextView: _processor.prompt];
     [headerView addSubview: textView];
     [overlayView addSubview: headerView];
