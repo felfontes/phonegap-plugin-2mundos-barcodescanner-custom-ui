@@ -1054,9 +1054,9 @@ parentViewController:(UIViewController*)parentViewController
     UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
     
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
-    [innerCancelButton setFrame: CGRectMake(0, 0, 20, 20)];
-    [innerCancelButton.widthAnchor constraintEqualToConstant: 20.0].active = YES;
-    [innerCancelButton.heightAnchor constraintEqualToConstant: 20.0].active = YES;
+    [innerCancelButton setFrame: CGRectMake(0, 0, 28, 28)];
+    [innerCancelButton.widthAnchor constraintEqualToConstant: 28.0].active = YES;
+    [innerCancelButton.heightAnchor constraintEqualToConstant: 28.0].active = YES;
     [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
     innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
     innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
