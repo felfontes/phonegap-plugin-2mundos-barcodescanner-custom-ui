@@ -1048,6 +1048,7 @@ parentViewController:(UIViewController*)parentViewController
     
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    toolbar.translucent = false;
     
     NSString *imagePathClose = [bundle pathForResource:@"close" ofType:@"png"];
     UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
