@@ -1134,11 +1134,34 @@ parentViewController:(UIViewController*)parentViewController
     
     bounds = overlayView.bounds;
     
-    [toolbar sizeToFit];
-    CGFloat toolbarHeight  = [toolbar frame].size.height;
     CGFloat rootViewHeight = CGRectGetHeight(bounds);
     CGFloat rootViewWidth  = CGRectGetWidth(bounds);
-    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight);
+    
+    CGFloat safeAreaInsetsTop = 0;
+    CGFloat safeAreaInsetsBottom = 0;
+    
+    // Set up the view on iPhone X
+    if (@available(iOS 11, *)) {
+        safeAreaInsetsTop = [UIApplication sharedApplication].delegate.window.safeAreaInsets.top;
+        if (safeAreaInsetsTop > 0) {
+            CGRect rectAreaTopSpaceHolder = CGRectMake(0, 0, rootViewWidth, safeAreaInsetsTop);
+            UIView *topSpaceHolder = [[UIView alloc] initWithFrame: rectAreaTopSpaceHolder];
+            topSpaceHolder.backgroundColor = headerFooterBackgroundColor;
+            [overlayView addSubview: topSpaceHolder];
+        }
+        
+        safeAreaInsetsBottom = [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom;
+        if (safeAreaInsetsBottom > 0) {
+            CGRect rectAreaBottomSpaceHolder = CGRectMake(0, rootViewHeight - safeAreaInsetsBottom, rootViewWidth, safeAreaInsetsBottom);
+            UIView *bottomSpaceHolder = [[UIView alloc] initWithFrame: rectAreaBottomSpaceHolder];
+            bottomSpaceHolder.backgroundColor = headerFooterBackgroundColor;
+            [overlayView addSubview: bottomSpaceHolder];
+        }
+    }
+    
+    [toolbar sizeToFit];
+    CGFloat toolbarHeight  = [toolbar frame].size.height;
+    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight - safeAreaInsetsBottom, rootViewWidth, toolbarHeight);
     [toolbar setFrame:rectArea];
     
     [overlayView addSubview: toolbar];
@@ -1149,7 +1172,7 @@ parentViewController:(UIViewController*)parentViewController
     
     rectArea = CGRectMake(
                           (CGFloat) (0.5 * (rootViewWidth  - minAxis) + RETICLE_OFFSET),
-                          (CGFloat) (0.5 * (rootViewHeight - minAxis) + RETICLE_OFFSET - 0.5*toolbarHeight),
+                          (CGFloat) (0.5 * (rootViewHeight - minAxis) + RETICLE_OFFSET),
                           minAxis - (RETICLE_OFFSET * 2),
                           minAxis - (RETICLE_OFFSET * 2)
                           );
@@ -1168,7 +1191,7 @@ parentViewController:(UIViewController*)parentViewController
     
     [overlayView addSubview: reticleView];
     
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect: CGRectMake(0, 0, bounds.size.width, bounds.size.height - toolbarHeight)];
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect: CGRectMake(0, safeAreaInsetsTop, bounds.size.width, bounds.size.height - toolbarHeight - safeAreaInsetsBottom - safeAreaInsetsTop)];
     UIBezierPath *windowPath = [UIBezierPath bezierPathWithRect: rectArea];
     [path appendPath: windowPath];
     [path setUsesEvenOddFillRule: YES];
@@ -1187,16 +1210,20 @@ parentViewController:(UIViewController*)parentViewController
     [overlayView addSubview: headerView];
     
     [headerView sizeToFit];
+    NSLayoutConstraint *headerHeightConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem: textView attribute: NSLayoutAttributeHeight multiplier:1.0 constant:0];
+    [overlayView addConstraint:headerHeightConstraint];
     
     headerView.translatesAutoresizingMaskIntoConstraints = NO;
     NSLayoutConstraint *headerWidthConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: overlayView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
     [overlayView addConstraint:headerWidthConstraint];
-    NSLayoutConstraint *headerYCenterConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: overlayView attribute: NSLayoutAttributeTop multiplier:1.0 constant:0];
+    NSLayoutConstraint *headerYCenterConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: overlayView attribute: NSLayoutAttributeTop multiplier:1.0 constant:safeAreaInsetsTop];
     [overlayView addConstraint:headerYCenterConstraint];
     
     textView.translatesAutoresizingMaskIntoConstraints = NO;
     NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem: textView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: headerView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
     [overlayView addConstraint:widthConstraint];
+    NSLayoutConstraint *textYConstraint = [NSLayoutConstraint constraintWithItem: textView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: headerView attribute: NSLayoutAttributeTop multiplier:1.0 constant:0];
+    [overlayView addConstraint:textYConstraint];
     
     return overlayView;
 }
