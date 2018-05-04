@@ -13,7 +13,7 @@ repositories{
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile 'com.github.felfontes:barcodescanner-lib-aar-custom-ui:2.1.10-2m'
+    compile 'com.github.felfontes:barcodescanner-lib-aar-custom-ui:2.1.11-2m'
 }
 
 android {
