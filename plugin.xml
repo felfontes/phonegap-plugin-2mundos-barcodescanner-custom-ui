@@ -7,7 +7,7 @@
   <issue>https://github.com/felfontes/phonegap-plugin-2mundos-barcodescanner-custom-ui/issues</issue>
   <engines>
     <engine name="cordova" version=">=3.0.0"/>
-    <engine name="cordova-android" version=">=6.3.0"/>
+    <engine name="cordova-android" version=">=6.2.3"/>
   </engines>
   <js-module src="www/barcodescanner.js" name="BarcodeScanner">
     <clobbers target="cordova.plugins.barcodeScanner"/>
