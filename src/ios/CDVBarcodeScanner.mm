@@ -1024,7 +1024,7 @@ parentViewController:(UIViewController*)parentViewController
     return self.overlayView;
 }
 
-#define RETICLE_OFFSET   15.0f
+#define RETICLE_OFFSET   70.0f
 
 //--------------------------------------------------------------------------
 - (UIView*)buildOverlayView {
@@ -1036,6 +1036,9 @@ parentViewController:(UIViewController*)parentViewController
     CGRect bounds = self.view.bounds;
     bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
     
+    CGFloat buttonsHeight = 50;
+    CGFloat buttonsYPosition = 25;
+
     UIView* overlayView = [[UIView alloc] initWithFrame:bounds];
     overlayView.autoresizesSubviews = YES;
     overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -1043,95 +1046,10 @@ parentViewController:(UIViewController*)parentViewController
     
     NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
     NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
-    
-    UIColor *headerFooterBackgroundColor = [UIColor colorWithRed:244 green:250 blue:252 alpha: 1.0];
-    
-    UIToolbar* toolbar = [[UIToolbar alloc] init];
-    toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    toolbar.translucent = false;
-    
-    NSString *imagePathClose = [bundle pathForResource:@"close" ofType:@"png"];
-    UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
-    
-    UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
-    [innerCancelButton setFrame: CGRectMake(0, 0, 28, 28)];
-    [innerCancelButton.widthAnchor constraintEqualToConstant: 28.0].active = YES;
-    [innerCancelButton.heightAnchor constraintEqualToConstant: 28.0].active = YES;
-    [innerCancelButton setImage: cancelImageStateNormal forState: UIControlStateNormal];
-    innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    innerCancelButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
-    [innerCancelButton addTarget: (id)self action: @selector(cancelButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
-    id cancelButton = [[UIBarButtonItem alloc] initWithCustomView: innerCancelButton];
-    
-    
-    
-    id flexSpace = [[[UIBarButtonItem alloc]
-                     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                     target:nil
-                     action:nil
-                     ] autorelease];
-    
-    id flipCamera = [[[UIBarButtonItem alloc]
-                      initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                      target:(id)self
-                      action:@selector(flipCameraButtonPressed:)
-                      ] autorelease];
-    
-    NSMutableArray *items;
-    
-#if USE_SHUTTER
-    
-    id shutterButton = [[[UIBarButtonItem alloc]
-                         initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                         target:(id)self
-                         action:@selector(shutterButtonPressed)
-                         ] autorelease];
-    
-    if (_processor.isShowFlipCameraButton) {
-        items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, flipCamera, shutterButton, nil];
-    } else {
-        items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, shutterButton, nil];
-    }
-#else
-    if (_processor.isShowFlipCameraButton) {
-        items = [@[flexSpace, cancelButton, flexSpace, flipCamera] mutableCopy];
-    } else {
-        //      items = [@[flexSpace, cancelButton, flexSpace] mutableCopy];
-        
-        //align cancel button right
-        items = [@[flexSpace, cancelButton] mutableCopy];
-        
-    }
-#endif
-    
-    if (_processor.isShowTorchButton && !_processor.isFrontCamera) {
-        AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        if ([device hasTorch] && [device hasFlash]) {
-            
-            NSString *imagePathFlashlightActive = [bundle pathForResource:@"flashlight_active" ofType:@"png"];
-            NSString *imagePathFlashlightInactive = [bundle pathForResource:@"flashlight_inactive" ofType:@"png"];
-            
-            UIImage * flashlightImageStateNormal = [UIImage imageWithContentsOfFile:imagePathFlashlightInactive];
-            UIImage * flashlightImageStateSelected = [UIImage imageWithContentsOfFile:imagePathFlashlightActive];
-            
-            UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
-            [flashlightButton setFrame: CGRectMake(0, 0, 35, 40)];
-            [flashlightButton.widthAnchor constraintEqualToConstant: 35.0].active = YES;
-            [flashlightButton.heightAnchor constraintEqualToConstant: 40.0].active = YES;
-            [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
-            [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
-            
-            flashlightButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-            flashlightButton.imageView.bounds = CGRectMake(0, 0, 20, 20);
-            [flashlightButton addTarget: (id)self action: @selector(torchButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
-            
-            id torchButton = [[UIBarButtonItem alloc] initWithCustomView: flashlightButton];
-            [items insertObject:torchButton atIndex:0];
-        }
-    }
-    
-    toolbar.items = items;
-    
+
+    UIColor *headerFooterBackgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha: 0];
+
+
     bounds = overlayView.bounds;
     
     CGFloat rootViewHeight = CGRectGetHeight(bounds);
@@ -1158,23 +1076,31 @@ parentViewController:(UIViewController*)parentViewController
             [overlayView addSubview: bottomSpaceHolder];
         }
     }
-    
-    [toolbar sizeToFit];
-    CGFloat toolbarHeight  = [toolbar frame].size.height;
-    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight - safeAreaInsetsBottom, rootViewWidth, toolbarHeight);
-    [toolbar setFrame:rectArea];
-    
-    [overlayView addSubview: toolbar];
-    
+
+
+    CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
+    CGFloat offsetBetweenReticleAndButtons = 20;
+
+    CGFloat reticleWidthOrHeight = minAxis - (RETICLE_OFFSET * 2);
+    CGFloat reticleLeftPoint = (CGFloat) (0.5 * (rootViewWidth  - minAxis) + RETICLE_OFFSET);
+    CGFloat reticleTopPoint = (CGFloat) (0.5 * (rootViewHeight  - minAxis) + RETICLE_OFFSET);
+    CGFloat reticleBottomPoint = reticleTopPoint + reticleWidthOrHeight;
+    CGRect rectArea = CGRectMake(0, reticleBottomPoint + offsetBetweenReticleAndButtons, rootViewWidth, 100);
+
+
+
+    //******************************
+    // Reticle / Area that'll read QR code
+    //******************************
+
     UIImage* reticleImage = [self buildReticleImage];
     UIView* reticleView = [[[UIImageView alloc] initWithImage:reticleImage] autorelease];
-    CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
     
     rectArea = CGRectMake(
-                          (CGFloat) (0.5 * (rootViewWidth  - minAxis) + RETICLE_OFFSET),
-                          (CGFloat) (0.5 * (rootViewHeight - minAxis) + RETICLE_OFFSET),
-                          minAxis - (RETICLE_OFFSET * 2),
-                          minAxis - (RETICLE_OFFSET * 2)
+                          reticleLeftPoint,
+                          reticleTopPoint,
+                          reticleWidthOrHeight,
+                          reticleWidthOrHeight
                           );
     
     [reticleView setFrame:rectArea];
@@ -1190,8 +1116,15 @@ parentViewController:(UIViewController*)parentViewController
     ;
     
     [overlayView addSubview: reticleView];
-    
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect: CGRectMake(0, safeAreaInsetsTop, bounds.size.width, bounds.size.height - toolbarHeight - safeAreaInsetsBottom - safeAreaInsetsTop)];
+
+    //******************************
+
+
+    //******************************
+    // Transparency over the entire screen
+    //******************************
+
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect: CGRectMake(0, safeAreaInsetsTop, bounds.size.width, bounds.size.height - safeAreaInsetsBottom - safeAreaInsetsTop)];
     UIBezierPath *windowPath = [UIBezierPath bezierPathWithRect: rectArea];
     [path appendPath: windowPath];
     [path setUsesEvenOddFillRule: YES];
@@ -1202,23 +1135,92 @@ parentViewController:(UIViewController*)parentViewController
     fillLayer.fillColor = [UIColor blackColor].CGColor;
     fillLayer.opacity = 0.7;
     [overlayView.layer addSublayer: fillLayer];
-    
-    UIView * headerView = [[UIView alloc] initWithFrame: CGRectZero];
+
+    //******************************
+
+
+    //******************************
+    // Cancel / Type code button
+    //******************************
+
+    NSString *imagePathClose = [bundle pathForResource:@"close" ofType:@"png"];
+    UIImage * cancelImageStateNormal = [UIImage imageWithContentsOfFile:imagePathClose];
+
+    UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
+    [innerCancelButton setFrame: CGRectMake((bounds.size.width * 0.38) + 10, reticleBottomPoint + buttonsHeight, buttonsHeight * 3, buttonsHeight)];
+    [innerCancelButton setTitle: @"Digitar dados" forState: UIControlStateNormal];
+    [innerCancelButton setTitleColor:[UIColor colorWithRed:0.15 green:0.24 blue:0.32 alpha:1 ] forState: UIControlStateNormal];
+
+    innerCancelButton.backgroundColor = [UIColor whiteColor];
+    innerCancelButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    innerCancelButton.imageView.bounds = CGRectMake(0, 0, buttonsHeight, buttonsHeight);
+
+    innerCancelButton.layer.borderColor = [UIColor whiteColor].CGColor;
+    innerCancelButton.layer.borderWidth = 2;
+    innerCancelButton.layer.cornerRadius = 10;
+
+    [innerCancelButton addTarget: (id)self action: @selector(cancelButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
+
+    [overlayView addSubview: innerCancelButton];
+
+    //******************************
+
+
+    //******************************
+    // Flashlight button
+    //******************************
+
+    if (_processor.isShowTorchButton && !_processor.isFrontCamera) {
+        AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+        if ([device hasTorch] && [device hasFlash]) {
+
+            NSString *imagePathFlashlightActive = [bundle pathForResource:@"flashlight_active" ofType:@"png"];
+            NSString *imagePathFlashlightInactive = [bundle pathForResource:@"flashlight_inactive" ofType:@"png"];
+
+            UIImage * flashlightImageStateNormal = [UIImage imageWithContentsOfFile:imagePathFlashlightInactive];
+            UIImage * flashlightImageStateSelected = [UIImage imageWithContentsOfFile:imagePathFlashlightActive];
+
+            UIButton *flashlightButton = [UIButton buttonWithType: UIButtonTypeCustom];
+
+            [flashlightButton setFrame: CGRectMake((bounds.size.width * 0.38) - buttonsHeight - 10, reticleBottomPoint + buttonsHeight, buttonsHeight, buttonsHeight)];
+            [flashlightButton setImage: flashlightImageStateNormal forState: UIControlStateNormal];
+            [flashlightButton setImage: flashlightImageStateSelected forState: UIControlStateSelected];
+
+            flashlightButton.backgroundColor = [UIColor whiteColor];
+            //flashlightButton.tintColor = [UIColor colorWithRed:38 green:61 blue:82 alpha: 1];
+            flashlightButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+            //flashlightButton.imageView.bounds = CGRectMake(buttonsHeight / 2, buttonsHeight / 2, buttonsHeight * 0.7, buttonsHeight * 0.7);
+            flashlightButton.imageEdgeInsets = UIEdgeInsetsMake(5, 5, 5, 5);
+
+            flashlightButton.layer.borderColor = [UIColor whiteColor].CGColor;
+            flashlightButton.layer.borderWidth = 2;
+            flashlightButton.layer.cornerRadius = 10;
+
+            [flashlightButton addTarget: (id)self action: @selector(torchButtonPressed:) forControlEvents: UIControlEventTouchUpInside];
+
+            [overlayView addSubview: flashlightButton];
+        }
+    }
+
+    //******************************
+
+
+    //******************************
+    // Header with UILabel
+    //******************************
+
+    CGFloat headerHeight = 100;
+    CGRect viewRect = CGRectMake(0, reticleTopPoint - headerHeight - 20, bounds.size.width, headerHeight);
+    UIView * headerView = [[UIView alloc] initWithFrame: viewRect];
     headerView.backgroundColor = headerFooterBackgroundColor;
-    UITextView* textView = [self buildTextView: _processor.prompt];
+
+    UILabel* textView = [self buildTextView: _processor.prompt];
     [headerView addSubview: textView];
     [overlayView addSubview: headerView];
-    
-    [headerView sizeToFit];
-    NSLayoutConstraint *headerHeightConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem: textView attribute: NSLayoutAttributeHeight multiplier:1.0 constant:0];
-    [overlayView addConstraint:headerHeightConstraint];
-    
-    headerView.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *headerWidthConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: overlayView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
-    [overlayView addConstraint:headerWidthConstraint];
-    NSLayoutConstraint *headerYCenterConstraint = [NSLayoutConstraint constraintWithItem: headerView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: overlayView attribute: NSLayoutAttributeTop multiplier:1.0 constant:safeAreaInsetsTop];
-    [overlayView addConstraint:headerYCenterConstraint];
-    
+
+    //******************************
+
+
     textView.translatesAutoresizingMaskIntoConstraints = NO;
     NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem: textView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: headerView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
     [overlayView addConstraint:widthConstraint];
@@ -1242,16 +1244,6 @@ parentViewController:(UIViewController*)parentViewController
     UIGraphicsBeginImageContext(CGSizeMake(RETICLE_SIZE, RETICLE_SIZE));
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    if (self.processor.is1D) {
-        UIColor* color = [UIColor colorWithRed:254.0/255.0 green:213.0/255.0 blue:0.0 alpha:RETICLE_ALPHA];
-        CGContextSetStrokeColorWithColor(context, color.CGColor);
-        CGContextSetLineWidth(context, RETICLE_WIDTH);
-        CGContextBeginPath(context);
-        CGContextMoveToPoint(context, 0, 0.5*RETICLE_SIZE);
-        CGContextAddLineToPoint(context, RETICLE_SIZE, 0.5*RETICLE_SIZE);
-        CGContextStrokePath(context);
-    }
-    
     if (self.processor.is2D) {
     }
     
@@ -1260,15 +1252,19 @@ parentViewController:(UIViewController*)parentViewController
     return result;
 }
 
-- (UITextView*) buildTextView: (NSString*)text {
-    UITextView* textView = [[UITextView alloc] initWithFrame: CGRectZero];
-    textView.textContainerInset = UIEdgeInsetsMake(15, 10, 15, 10);
-    textView.textContainer.lineBreakMode = NSLineBreakByWordWrapping;
-    textView.scrollEnabled = NO;
-    [textView setFont:[UIFont systemFontOfSize: 17]];
-    [textView setTextColor:[UIColor colorWithRed:0.0 green:72.0/255.0 blue:148.0/255.0 alpha:1.0]];
-    [textView setText: text];
-    [textView sizeToFit];
+
+- (UILabel*) buildTextView: (NSString*)text {
+    CGRect bounds = self.view.bounds;
+
+    UILabel* textView = [[UILabel alloc] initWithFrame: CGRectZero];
+    textView.text = text;
+    textView.numberOfLines = 2;
+    textView.textAlignment = NSTextAlignmentCenter;
+    textView.textColor = [UIColor whiteColor];
+    textView.font = [textView.font fontWithSize:22];
+    textView.preferredMaxLayoutWidth = bounds.size.width - 200;
+    //[textView setFont:[UIFont fontWithName:@"CircularStd-Medium"]];
+    [textView setLineBreakMode:NSLineBreakByWordWrapping];
     return textView;
 }
 
