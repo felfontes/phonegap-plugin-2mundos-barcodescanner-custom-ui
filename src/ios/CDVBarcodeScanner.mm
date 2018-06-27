@@ -1048,6 +1048,7 @@ parentViewController:(UIViewController*)parentViewController
     NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
 
     UIColor *headerFooterBackgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha: 0];
+    UIColor *safeAreaInsetsTransparency = [UIColor colorWithRed:0 green:0 blue:0 alpha: 0.7];
 
 
     bounds = overlayView.bounds;
@@ -1064,7 +1065,7 @@ parentViewController:(UIViewController*)parentViewController
         if (safeAreaInsetsTop > 0) {
             CGRect rectAreaTopSpaceHolder = CGRectMake(0, 0, rootViewWidth, safeAreaInsetsTop);
             UIView *topSpaceHolder = [[UIView alloc] initWithFrame: rectAreaTopSpaceHolder];
-            topSpaceHolder.backgroundColor = headerFooterBackgroundColor;
+            topSpaceHolder.backgroundColor = safeAreaInsetsTransparency;
             [overlayView addSubview: topSpaceHolder];
         }
         
@@ -1072,7 +1073,7 @@ parentViewController:(UIViewController*)parentViewController
         if (safeAreaInsetsBottom > 0) {
             CGRect rectAreaBottomSpaceHolder = CGRectMake(0, rootViewHeight - safeAreaInsetsBottom, rootViewWidth, safeAreaInsetsBottom);
             UIView *bottomSpaceHolder = [[UIView alloc] initWithFrame: rectAreaBottomSpaceHolder];
-            bottomSpaceHolder.backgroundColor = headerFooterBackgroundColor;
+            bottomSpaceHolder.backgroundColor = safeAreaInsetsTransparency;
             [overlayView addSubview: bottomSpaceHolder];
         }
     }
