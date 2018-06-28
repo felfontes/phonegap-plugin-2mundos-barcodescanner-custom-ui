@@ -1149,7 +1149,7 @@ parentViewController:(UIViewController*)parentViewController
 
     UIButton *innerCancelButton = [UIButton buttonWithType: UIButtonTypeCustom];
     [innerCancelButton setFrame: CGRectMake((bounds.size.width * 0.38) + 10, reticleBottomPoint + buttonsHeight, buttonsHeight * 3, buttonsHeight)];
-    [innerCancelButton setTitle: @"Digitar dados" forState: UIControlStateNormal];
+    [innerCancelButton setTitle: @"Voltar" forState: UIControlStateNormal];
     [innerCancelButton setTitleColor:[UIColor colorWithRed:0.15 green:0.24 blue:0.32 alpha:1 ] forState: UIControlStateNormal];
 
     innerCancelButton.backgroundColor = [UIColor whiteColor];
