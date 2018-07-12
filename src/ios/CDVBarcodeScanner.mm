@@ -189,7 +189,7 @@
         [self returnError:capabilityError callback:callback];
         return;
     } else if ([self notHasPermission]) {
-        NSString * error = NSLocalizedString(@"Access to the camera has been prohibited; please enable it in the Settings app to continue.",nil);
+        NSString * error = NSLocalizedString(@"O acesso à câmera foi negado anteriormente. Por favor, habilite o uso da câmera nas configurações do aplicativo Ride em 'Ajustes'.",nil);
         [self returnError:error callback:callback];
         return;
     }
