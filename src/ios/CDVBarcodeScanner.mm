@@ -72,6 +72,7 @@
 @property (nonatomic)         BOOL                        isTransitionAnimated;
 @property (nonatomic)         BOOL                        isSuccessBeepEnabled;
 @property (nonatomic, retain) NSString*                   prompt;
+@property (nonatomic, retain) NSString*                   pageTitle;
 @property (nonatomic)         BOOL                        isLandscapeOrientationEnabled;
 @property (nonatomic)         BOOL                        isPortraitOrientationEnabled;
 @property (nonatomic)         BOOL                        isUpsideDownOrientationEnabled;
@@ -245,6 +246,8 @@
     
     processor.prompt = options[@"prompt"];
     
+    processor.pageTitle = options[@"pageTitle"];
+
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
 
@@ -1207,27 +1210,47 @@ parentViewController:(UIViewController*)parentViewController
 
 
     //******************************
+    // Title with UILabel
+    //******************************
+
+    CGFloat titleHeight = 150;
+    CGRect titleViewRect = CGRectMake(30, 30, bounds.size.width - 80, titleHeight);
+    UIView * titleView = [[UIView alloc] initWithFrame: titleViewRect];
+    titleView.backgroundColor = headerFooterBackgroundColor;
+
+    UILabel* titleTextView = [self buildTitleTextView: _processor.pageTitle];
+    [titleView addSubview: titleTextView];
+    [overlayView addSubview: titleView];
+
+
+    //******************************
     // Header with UILabel
     //******************************
 
-    CGFloat headerHeight = 100;
-    CGRect viewRect = CGRectMake(0, reticleTopPoint - headerHeight - 20, bounds.size.width, headerHeight);
+    CGFloat headerHeight = 75;
+    CGRect viewRect = CGRectMake(0, reticleTopPoint - headerHeight, bounds.size.width, headerHeight);
     UIView * headerView = [[UIView alloc] initWithFrame: viewRect];
     headerView.backgroundColor = headerFooterBackgroundColor;
 
-    UILabel* textView = [self buildTextView: _processor.prompt];
+    UILabel* textView = [self buildHeaderTextView: _processor.prompt];
     [headerView addSubview: textView];
     [overlayView addSubview: headerView];
 
     //******************************
 
 
+    titleTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSLayoutConstraint *titleWidthConstraint = [NSLayoutConstraint constraintWithItem: titleTextView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: titleView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
+    [overlayView addConstraint:titleWidthConstraint];
+    NSLayoutConstraint *titleTextYConstraint = [NSLayoutConstraint constraintWithItem: titleTextView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: titleView attribute: NSLayoutAttributeTop multiplier:1.0 constant:0];
+    [overlayView addConstraint:titleTextYConstraint];
+
     textView.translatesAutoresizingMaskIntoConstraints = NO;
     NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem: textView attribute: NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem: headerView attribute: NSLayoutAttributeWidth multiplier:1.0 constant:0];
     [overlayView addConstraint:widthConstraint];
     NSLayoutConstraint *textYConstraint = [NSLayoutConstraint constraintWithItem: textView attribute: NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem: headerView attribute: NSLayoutAttributeTop multiplier:1.0 constant:0];
     [overlayView addConstraint:textYConstraint];
-    
+
     return overlayView;
 }
 
@@ -1254,7 +1277,7 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 
-- (UILabel*) buildTextView: (NSString*)text {
+- (UILabel*) buildHeaderTextView: (NSString*)text {
     CGRect bounds = self.view.bounds;
 
     UILabel* textView = [[UILabel alloc] initWithFrame: CGRectZero];
@@ -1262,10 +1285,30 @@ parentViewController:(UIViewController*)parentViewController
     textView.numberOfLines = 2;
     textView.textAlignment = NSTextAlignmentCenter;
     textView.textColor = [UIColor whiteColor];
-    textView.font = [textView.font fontWithSize:22];
+    textView.font = [textView.font fontWithSize:18];
     textView.preferredMaxLayoutWidth = bounds.size.width - 200;
     //[textView setFont:[UIFont fontWithName:@"CircularStd-Medium"]];
     [textView setLineBreakMode:NSLineBreakByWordWrapping];
+    return textView;
+}
+
+- (UILabel*) buildTitleTextView: (NSString*)text {
+    CGRect bounds = self.view.bounds;
+
+    UILabel* textView = [[UILabel alloc] initWithFrame: CGRectZero];
+    textView.numberOfLines = 2;
+    textView.textAlignment = NSTextAlignmentLeft;
+    textView.textColor = [UIColor whiteColor];
+    textView.font = [textView.font fontWithSize:26];
+    textView.preferredMaxLayoutWidth = bounds.size.width - 100;
+    [textView setLineBreakMode:NSLineBreakByWordWrapping];
+
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.headIndent = 30.0;
+    paragraphStyle.firstLineHeadIndent = 30.0;
+    NSDictionary *attrsDictionary = @{NSParagraphStyleAttributeName: paragraphStyle};
+    textView.attributedText = [[NSAttributedString alloc] initWithString:text attributes:attrsDictionary];
+
     return textView;
 }
 
